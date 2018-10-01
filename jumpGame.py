@@ -42,8 +42,14 @@ class Enviroment:
                     random.randint(0,8)
             else:
                 block = lastBlock + random.randint(-2,2)
-                while block == lastBlock or block == twoLastBlock or block > 8 or block < 0 or block == threeLastBlock:
+                while block == lastBlock or block == twoLastBlock or block > 9 or block < 0 or block == threeLastBlock:
+                    print(i)
                     block = lastBlock + random.randint(-2,2)
+                    print("Block: " + str(block))
+                    print("lastBlock: " + str(lastBlock))
+                    print("2 lastBlock: " + str(twoLastBlock))
+                    print("3 lastBlock: " + str(threeLastBlock))
+
             self.grounds[i][block][0] = 1
             threeLastBlock = twoLastBlock
             twoLastBlock = lastBlock
@@ -71,7 +77,6 @@ class Player:
     def left(event,self):
         self.x -= 1
         print(self.x)
-        print(self.y)
     def right(event,self):
         self.x += 1
         print(self.x)
@@ -87,6 +92,7 @@ player.setup()
 
 root.bind("a",player.left)
 root.bind("d",player.right)
+#player.x = 100000
 while True:
     player.render()
     enviroment.render()
