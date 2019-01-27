@@ -16,6 +16,8 @@ class Game:
         self.keys = []
         self.button = False
         self.dead = False
+        self.startScreen = True
+        self.startText = canvas.create_text(0,0)
         root.bind('<KeyPress>',self.keyPress)
         root.bind('<KeyRelease>',self.keyRelease)
         root.bind('<Button-1>',self.buttonPress)
@@ -35,24 +37,33 @@ class Game:
         self.dead = False
         for i in self.players:
             i.respawn()
+    def drawStartScreen(self):
+        canvas.delete(self.startText)
+        self.startText = canvas.create_text(root.winfo_screenwidth()/2,root.winfo_screenheight()/2,text='untitled',font=('TkTextFont',100),fill='blue')
     def update(self):
-        self.render()
-        for i in self.players:
-            i.update()
-            if i.pulse:
-                for l in self.players:
-                    if l != i:
-                        if l.x-25<i.x+25 and l.x+25>i.x-25 and l.y-25<i.y+25 and l.y+25>i.y-25:
-                            xDist = abs(l.x-i.x)
-                            if xDist == 0:
-                                xDist = 1
-                            yDist = abs(l.x-i.x)
-                            if yDist == 0:
-                                yDist = 1
-                            xrat = xDist/yDist
-                            yrat = yDist/xDist
-                            l.velX = 6 * (l.x-i.x)/xDist*xrat
-                            l.velY = 6 * (l.y-i.y)/yDist*yrat
+        if not self.startScreen:
+            self.render()
+            for i in self.players:
+                i.update()
+                if i.pulse:
+                    for l in self.players:
+                        if l != i:
+                            if l.x-25<i.x+25 and l.x+25>i.x-25 and l.y-25<i.y+25 and l.y+25>i.y-25:
+                                xDist = abs(l.x-i.x)
+                                if xDist == 0:
+                                    xDist = 1
+                                yDist = abs(l.x-i.x)
+                                if yDist == 0:
+                                    yDist = 1
+                                xrat = xDist/yDist
+                                yrat = yDist/xDist
+                                l.velX = 6 * (l.x-i.x)/xDist*xrat
+                                l.velY = 6 * (l.y-i.y)/yDist*yrat
+        else:
+            self.render()
+            self.drawStartScreen()
+            if not len(self.keys)==0 or self.button:
+                self.startScreen = False
         if 'Escape' in self.keys:
             self.game = False
         elif 'r' in self.keys and self.dead:
@@ -73,6 +84,7 @@ class Player:
         self.originalY = y
         self.velX = 0
         self.velY = 0
+        self.deaths = 0
         self.color = color
         self.skin = canvas.create_rectangle(0,0,0,0)
         self.pulse = None
@@ -80,6 +92,8 @@ class Player:
         self.pulseColor = pulseColor
         self.pulseAvailible = True
         self.pulseHitTime = time()*100
+        self.scoreText = canvas.create_text(0,0)
+        self.scoreWords = canvas.create_text(0,0)
         self.inputs = inputSet
     def respawn(self):
         self.x = self.originalX
@@ -99,16 +113,16 @@ class Player:
             self.pulseAvailible = True
     def input(self):
         if self.inputs == 'wasd':
-            if 'w' in game.keys:
+            if 's' in game.keys:
                 if self.velY < 6:
                     self.velY += .2
-            if 's' in game.keys:
+            if 'w' in game.keys:
                 if self.velY > -6:
                     self.velY -= .2
-            if 'd' in game.keys:
+            if 'a' in game.keys:
                 if self.velX > -6:
                     self.velX -= .2
-            if 'a' in game.keys:
+            if 'd' in game.keys:
                 if self.velX < 6:
                     self.velX += .2
             if 'space' in game.keys and self.pulseAvailible:
@@ -139,6 +153,10 @@ class Player:
 
         canvas.delete(self.skin)
         self.skin = canvas.create_rectangle(self.x+10,self.y+10,self.x-10,self.y-10,fill=self.color)
+
+        canvas.delete(self.scoreWords)
+        canvas.delete(self.scoreText)
+        self.scoreWords = canvas.create_text(self.originalX, )
 
 
 game = Game()
