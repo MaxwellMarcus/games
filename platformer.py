@@ -3,6 +3,7 @@ try:
 except:
     from Tkinter import *
 import time
+import math
 root = Tk()
 canvas = Canvas(root,width=root.winfo_screenwidth(),height=root.winfo_screenheight())
 canvas.pack()
@@ -19,7 +20,7 @@ class Game:
 
         self.keys = []
 
-        self.colliders = [Collider(100,0,200,300)]
+        self.colliders = [Collider(100,0,200,500)]
 
     def key_press(self,event):
         self.keys.append(event.keysym)
@@ -34,27 +35,36 @@ class Game:
         self.delta_time = time.time()-self.last_update
         if self.delta_time > 0:
             player.render()
-            player_speed = (self.delta_time)*500#100 p/s: dt/s*100
+        #    player_speed = (self.delta_time)*500#100 p/s: dt/s*100
             if 'd' in self.keys:
-                player.set_vel(player_speed,0)
-                self.key_release(None,key='d')
+                player.accelerate(1,0)
             if 'a' in self.keys:
-                player.set_vel(-player_speed,0)
-                self.key_release(None,key='a')
+                player.accelerate(-1,0)
             player.move()
             self.last_update = time.time()
 
             for i in self.colliders:
                 i.render()
-                if i.has_collided(player.collider):
-                    
+                l = i.has_collided(player.collider)#player.collider.has_collided(i)
+                if l:
+                    print('working')
+                    if l == 1:
+                        print('working * 2')
+                        x = player.collider.start_x
+                        y = player.collider.start_y
+                        if y > i.start_y and y < i.end_x:
+                            print('working * 3')
+                            player.set_vel(-player.vel_x,player.vel_y)
+                        else:
+                            print('working*3')
+                            player.set_vel(player.vel_x,-player.vel_y)
             root.update()
 
 
 class Player:
     def __init__(self):
         self.x = 10
-        self.y = 100
+        self.y = 400
 
         self.collider = Collider(self.x,self.y,self.x+50,self.y-100)
 
@@ -62,6 +72,9 @@ class Player:
         self.vel_y = 0
 
         self.skin = canvas.create_rectangle(0,0,0,0)
+    def accelerate(self,x,y):
+        self.vel_x += x
+        self.vel_y += y
     def set_vel(self,x,y):
         self.vel_x = x
         self.vel_y = y
@@ -72,8 +85,8 @@ class Player:
         self.collider.start_y = self.y-100
         self.collider.end_x = self.x+50
         self.collider.end_y = self.y
-        self.vel_x -= self.vel_x/10
-        self.vel_y -= self.vel_y/10
+        self.vel_x -= self.vel_x/30
+        self.vel_y -= self.vel_y/30
         if abs(self.vel_x) < 0.1:
             self.vel_x = 0
         if abs(self.vel_y) < 0.1:
@@ -96,31 +109,35 @@ class Collider:
         self.skin = canvas.create_rectangle(0,0,0,0)
         self.collided = False
     def has_collided(self,object):
-        has_collided = False
+        corner = False
         if object.start_x >= self.start_x:
             if object.start_x <= self.end_x:
                 if object.start_y >= self.start_y:
                     if object.start_y <= self.end_y:
-                        has_collided = True
+                        corner = 1
         elif object.end_x >= self.start_x:
             if object.end_x <= self.end_x:
                 if object.start_y >= self.start_y:
                     if object.start_y <= self.end_y:
-                        has_collided = True
+                        corner = 1
         elif object.end_x >= self.start_x:
             if object.end_x <= self.end_x:
                 if object.end_y >= self.start_y:
                     if object.end_y <= self.end_y:
-                        has_collided = True
+                        corner = 1
         elif object.start_x >= self.start_x:
             if object.start_x <= self.end_x:
                 if object.end_y >= self.start_y:
                     if object.end_y <= self.end_y:
-                        has_collided = True
+                        corner = 1
         elif object.has_collided2(self):
-            has_collided = True
-        self.collided = has_collided
-        return has_collided
+            corner = True
+        print(corner)
+        if not corner == False:
+            self.collided = True
+        else:
+            self.collided = False
+        return corner
     def has_collided2(self,object):
         has_collided = False
         if object.start_x >= self.start_x:
@@ -159,7 +176,7 @@ game = Game()
 player = Player()
 
 root.bind('<KeyPress>',game.key_press)
-#root.bind('<KeyRelease>',game.key_release)
+root.bind('<KeyRelease>',game.key_release)
 
 while game.loop:
     game.update()
