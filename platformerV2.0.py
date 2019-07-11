@@ -19,7 +19,8 @@ class Game:
         self.screen_diff_x = self.screen_width/1040
         self.screen_diff_y = self.screen_height/900
 
-        self.started_game = False
+        self.start_screen = True
+        self.pause_screen = False
 
         self.coin_img = PhotoImage(file='IMG_1073.gif')
         scale = int(1032/50)
@@ -45,21 +46,6 @@ class Game:
 
         self.colliders = [Collider(0,0,self.screen_width,50),Collider(0,0,50,self.screen_height),Collider(0,self.screen_height-50,self.screen_width,self.screen_height),Collider(self.screen_width-50,self.screen_height,self.screen_width,0)]
         self.blocks = []
-    #    self.colliders.append(Collider(0,75,100,100))
-    #    self.colliders.append(Collider(300,175,400,200))
-    #    self.colliders.append(Collider(600,275,700,300))
-    #    self.colliders.append(Collider(0,475,100,500))
-    #    self.colliders.append(Collider(300,375,400,400))
-    #    self.colliders.append(Collider(300,575,400,600))
-    #    self.colliders.append(Collider(600,675,700,700))
-    #    self.colliders.append(Collider(900,575,1000,600))
-    #    self.colliders.append(Collider(1200,475,1300,500))
-    #    self.colliders.append(Collider(900,375,1000,400))
-    #    self.colliders.append(Collider(900,175,1000,200))
-    #    self.colliders.append(Collider(1200,75,1300,100))
-    #    self.colliders.append(Collider(0,275,100,300))
-    #    self.colliders.append(Collider(1200,275,1300,300))
-    #    self.colliders.append(Collider(600,475,700,500))
 
         self.coins = []
         self.geysers = []
@@ -70,166 +56,51 @@ class Game:
         self.geyser_levels = 6
         self.mirror_levels = 10
         self.mirror_geyser_levels = 14
-    #    self.coins.append(Collider(25,110,75,160))
-    #    self.coins.append(Collider(325,210,375,260))
-    #    self.coins.append(Collider(625,310,675,360))
-    #    self.coins.append(Collider(925,410,975,460))
-    #    self.coins.append(Collider(1225,510,1275,560))
-    #    self.coins.append(Collider(25,310,75,360))
-    #    self.coins.append(Collider(325,410,375,460))
-    #    self.coins.append(Collider(625,510,675,560))
-    #    self.coins.append(Collider(925,610,975,660))
-    #    self.coins.append(Collider(25,510,75,560))
-    #    self.coins.append(Collider(325,610,375,660))
-    #    self.coins.append(Collider(625,710,675,760))
-    #    self.coins.append(Collider(1225,110,1275,160))
-    #    self.coins.append(Collider(1225,310,1275,360))
-    #    self.coins.append(Collider(925,210,975,260))
 
         self.extra = canvas.create_rectangle(0,0,0,0)
 
     def set_coins(self):
         self.coins = []
         self.blocks = []
-        if self.level == 2:
-            self.coins.append(Collider(25,110,75,160,image=self.coin_img))
-            self.coins.append(Collider(325,210,375,260,image=self.coin_img))
-            self.coins.append(Collider(625,310,675,360,image=self.coin_img))
-            self.coins.append(Collider(925,410,975,460,image=self.coin_img))
-            self.coins.append(Collider(1225,510,1275,560,image=self.coin_img))
-            self.coins.append(Collider(25,310,75,360,image=self.coin_img))
-            self.coins.append(Collider(325,410,375,460,image=self.coin_img))
-            self.coins.append(Collider(625,510,675,560,image=self.coin_img))
-            self.coins.append(Collider(925,610,975,660,image=self.coin_img))
-            self.coins.append(Collider(25,510,75,560,image=self.coin_img))
-            self.coins.append(Collider(325,610,375,660,image=self.coin_img))
-            self.coins.append(Collider(625,710,675,760,image=self.coin_img))
-            self.coins.append(Collider(1225,110,1275,160,image=self.coin_img))
-            self.coins.append(Collider(1225,310,1275,360,image=self.coin_img))
-            self.coins.append(Collider(925,210,975,260,image=self.coin_img))
-        elif self.level == 1:
-            self.coins.append(Collider(25,110,75,160,image=self.coin_img))
-            self.coins.append(Collider(325,210,375,260,image=self.coin_img))
-            self.coins.append(Collider(625,310,675,360,image=self.coin_img))
-            self.coins.append(Collider(925,410,975,460,image=self.coin_img))
-            self.coins.append(Collider(1225,510,1275,560,image=self.coin_img))
-        elif self.level == 5:
-            self.coins.append(Collider(25,110,75,160,image=self.coin_img))
-            self.coins.append(Collider(325,210,375,260,image=self.coin_img))
-            self.coins.append(Collider(625,310,675,360,image=self.coin_img))
-            self.coins.append(Collider(925,410,975,460,image=self.coin_img))
-            self.coins.append(Collider(1225,510,1275,560,image=self.coin_img))
-            self.blocks.append(Collider(1280,410,1300,460,image='color'))
-            self.blocks.append(Collider(1200,440,1300,460,image='color'))
-            self.coins.append(Collider(1225,410,1275,460,image=self.coin_img))
-            self.blocks.append(Collider(980,310,1000,360,image='color'))
-            self.blocks.append(Collider(900,340,1000,360,image='color'))
-            self.coins.append(Collider(925,310,975,360,image=self.coin_img))
-            self.blocks.append(Collider(680,210,700,260,image='color'))
-            self.blocks.append(Collider(600,240,700,260,image='color'))
-            self.coins.append(Collider(625,210,675,260,image=self.coin_img))
-            self.blocks.append(Collider(380,110,400,160,image='color'))
-            self.blocks.append(Collider(300,140,400,160,image='color'))
-            self.coins.append(Collider(325,110,375,160,image=self.coin_img))
-        elif self.level == 3:
-            self.coins.append(Collider(25,110,75,160,image=self.coin_img))
-            self.coins.append(Collider(400,210,450,260,image=self.coin_img))
-            self.coins.append(Collider(775,310,825,360,image=self.coin_img))
-            self.coins.append(Collider(1125,410,1175,460,image=self.coin_img))
-        elif self.level == 4:
-            self.coins.append(Collider(25,110,75,160,image=self.coin_img))
-            self.coins.append(Collider(310,255,360,305,image=self.coin_img))
-            self.coins.append(Collider(585,400,635,450,image=self.coin_img))
-            self.coins.append(Collider(870,545,920,590,image=self.coin_img))
-        elif self.level == self.geyser_levels:
-            self.coins.append(Collider(25,110,75,160,image=self.coin_img))
-            self.coins.append(Collider(325,210,375,260,image=self.coin_img))
-            self.coins.append(Collider(625,310,675,360,image=self.coin_img))
-            self.coins.append(Collider(925,410,975,460,image=self.coin_img))
-            self.coins.append(Collider(1225,510,1275,560,image=self.coin_img))
-        elif self.level == self.geyser_levels + 1:
-            self.coins.append(Collider(25,110,75,160,image=self.coin_img))
-            self.coins.append(Collider(325,210,375,260,image=self.coin_img))
-            self.coins.append(Collider(625,310,675,360,image=self.coin_img))
-            self.coins.append(Collider(925,410,975,460,image=self.coin_img))
-            self.coins.append(Collider(1225,510,1275,560,image=self.coin_img))
-            self.coins.append(Collider(25,310,75,360,image=self.coin_img))
-            self.coins.append(Collider(325,410,375,460,image=self.coin_img))
-            self.coins.append(Collider(625,510,675,560,image=self.coin_img))
-            self.coins.append(Collider(925,610,975,660,image=self.coin_img))
-            self.coins.append(Collider(25,510,75,560,image=self.coin_img))
-            self.coins.append(Collider(325,610,375,660,image=self.coin_img))
-            self.coins.append(Collider(625,710,675,760,image=self.coin_img))
-            self.coins.append(Collider(1225,110,1275,160,image=self.coin_img))
-            self.coins.append(Collider(1225,310,1275,360,image=self.coin_img))
-            self.coins.append(Collider(925,210,975,260,image=self.coin_img))
-        elif self.level == self.geyser_levels + 2:
-            self.coins.append(Collider(25,110,75,160,image=self.coin_img))
-            self.coins.append(Collider(400,210,450,260,image=self.coin_img))
-            self.coins.append(Collider(775,310,825,360,image=self.coin_img))
-            self.coins.append(Collider(1125,410,1175,460,image=self.coin_img))
-        elif self.level == self.geyser_levels + 3:
-            self.coins.append(Collider(25,110,75,160,image=self.coin_img))
-            self.coins.append(Collider(310,255,360,305,image=self.coin_img))
-            self.coins.append(Collider(585,400,635,450,image=self.coin_img))
-            self.coins.append(Collider(870,545,920,590,image=self.coin_img))
-        elif self.level == self.mirror_levels:
-            self.coins.append(Collider(25,35,75,85,image=self.coin_img,mirror=True))
-            self.coins.append(Collider(325,135,375,185,image=self.coin_img,mirror=True))
-            self.coins.append(Collider(625,235,675,285,image=self.coin_img,mirror=True))
-            self.coins.append(Collider(925,335,975,385,image=self.coin_img,mirror=True))
-            self.coins.append(Collider(1225,435,1275,485,image=self.coin_img,mirror=True))
-        elif self.level == self.mirror_levels + 1:
-            self.coins.append(Collider(25,110,75,160,image=self.coin_img,mirror=True))
-            self.coins.append(Collider(310,255,360,305,image=self.coin_img,mirror=True))
-            self.coins.append(Collider(585,400,635,450,image=self.coin_img,mirror=True))
-        elif self.level == self.mirror_levels + 2:
-            self.coins.append(Collider(25,110,75,160,image=self.coin_img,mirror=True))
-            self.coins.append(Collider(310,255,360,305,image=self.coin_img,mirror=True))
-            self.coins.append(Collider(585,400,635,450,image=self.coin_img,mirror=True))
-            self.coins.append(Collider(810,255,860,305,image=self.coin_img,mirror=True))
-            self.coins.append(Collider(1085,110,1135,160,image=self.coin_img,mirror=True))
-        elif self.level == self.mirror_levels + 3:
-            self.blocks.append(Collider(380,110,400,160,image='color'))#,mirror=True))
-            self.blocks.append(Collider(300,140,400,160,image='color'))#,mirror=True))
-            self.coins.append(Collider(325,110,375,160,image=self.coin_img))#,mirror=True))
-            self.coins.append(Collider(25,110,75,160,image=self.coin_img))#,mirror=True))
-            self.coins.append(Collider(325,210,375,260,image=self.coin_img))#,mirror=True))
-        else:
-            if not self.time:
-                self.time = time.time()
+        if self.level == 1:
+            for i in range(4):
+                x = i*300
+                self.coins.append(Collider(x+50,100,x+100,150,image=self.coin_img))
+            for i in range(4):
+                x = i*300+1250
+                y = i*100+200
+                self.coins.append(Collider(x,y,x+50,y+50,image=self.coin_img))
+            for i in range(4):
+                x = i*300+2450
+                y = 400 - i*100
+                self.coins.append(Collider(x,y,x+50,y+50,image=self.coin_img))
+            for i in range(8):
+                x = i*300+3650
+                y = i*100+200
+                self.coins.append(Collider(x,y,x+50,y+50,image=self.coin_img))
+            for i in range(2):
+                x = i*300+6050
+                y = 800 - i*800
+                self.coins.append(Collider(x,y,x+50,y+50,image=self.coin_img))
+        elif self.level == 2:
+            self.coins.append(Collider(50,100,100,150,image=self.coin_img))
+            self.coins.append(Collider(400,100,450,150,image=self.coin_img,moving=300,starting_pos=random.randint(0,300)))
+            self.coins.append(Collider(700,100,750,150,image=self.coin_img,moving=300,starting_pos=random.randint(0,300)))
     def set_platforms(self):
-        self.colliders = [Collider(0,0,self.screen_width,15),Collider(0,0,15,self.screen_height),Collider(0,self.screen_height-15,self.screen_width,self.screen_height),Collider(self.screen_width-15,self.screen_height,self.screen_width,0)]
+        self.colliders = [Collider(0,0,50000,15),Collider(0,0,15,self.screen_height),Collider(0,self.screen_height-15,self.screen_width,self.screen_height)]
         for i in self.coins:
             x1 = i.start_x - 25
             x2 = i.start_x + 75
             y1 = i.end_y - 85
             y2 = i.end_y - 60
-            self.colliders.append(Collider(x1,y1,x2,y2,image=self.platform_img,mirror=i.mirror))
+            self.colliders.append(Collider(x1,y1,x2,y2,image=self.platform_img,mirror=i.mirror,moving=i.moving))
         for i in self.blocks:
             self.colliders.append(i)
 
 
     def set_geysers(self):
         self.geysers = []
-        if self.level == self.geyser_levels:
-            self.geysers.append(Geyser(200,0))
-            self.geysers.append(Geyser(500,0))
-            self.geysers.append(Geyser(800,0))
-            self.geysers.append(Geyser(1100,0))
-        elif self.level == self.geyser_levels+1:
-            self.geysers.append(Geyser(200,0))
-            self.geysers.append(Geyser(500,0))
-            self.geysers.append(Geyser(800,0))
-            self.geysers.append(Geyser(1100,0))
-        elif self.level == self.geyser_levels+2:
-            self.geysers.append(Geyser(237,0))
-            self.geysers.append(Geyser(617,0))
-            self.geysers.append(Geyser(987,0))
-        elif self.level == self.geyser_levels+3:
-            self.geysers.append(Geyser(190,0))
-            self.geysers.append(Geyser(475,0))
-            self.geysers.append(Geyser(750,0))
+
     def key_press(self,event):
         self.keys.append(event.keysym)
     def key_release(self,event,key=None):
@@ -241,7 +112,7 @@ class Game:
                 self.keys.remove(key)
     def update(self):
         self.delta_time = time.time()-self.last_update
-        if self.started_game:
+        if not self.start_screen and not self.pause_screen:
             if self.delta_time > 0:
                 canvas.delete(ALL)
                 canvas.create_image(0,0, anchor=NW, image=self.bg)
@@ -270,15 +141,18 @@ class Game:
             #    player_speed = (self.delta_time)*500#100 p/s: dt/s*100
                 if 'd' in self.keys:
                     forwards = True
-                    player.accelerate(1,0)
+                    player.accelerate(2,0)
                     self.started = True
                 if 'a' in self.keys:
                     backwards = True
-                    player.accelerate(-1,0)
+                    player.accelerate(-2,0)
                     self.started = True
                 if 'r' in self.keys:
                     player.x = 51
                     player.y = 400
+                if 'Escape' in self.keys:
+                    self.pause_screen = True
+                    self.keys = []
                 if player.walks == 2:
                     player.walks = 0
                 if forwards == True:
@@ -292,7 +166,7 @@ class Game:
                     self.done_starting = True
                     self.timer = time.time()
                 #Gravty
-                player.accelerate(0,-.5)
+                player.accelerate(0,-1)
                 for i in self.colliders:
                     i.render()
                     l = i.has_collided(player.collider)#player.collider.has_collided(i)
@@ -343,7 +217,7 @@ class Game:
                                 player.y = i.end_y+24
                                 player.vel_y += abs(player.vel_y)
                                 if 'w' in self.keys:
-                                    player.accelerate(0,20)
+                                    player.accelerate(0,40)
                                     self.key_release(None,'w')
                             else:
                                 player.y = i.start_y
@@ -384,12 +258,30 @@ class Game:
                 root.update()
     #            print('')
         else:
-            canvas.delete(ALL)
-            canvas.create_image(0,0, anchor=NW, image=self.bg)
-            canvas.create_text(self.screen_width/2,self.screen_height/2,text='game',font=('TkTextFont',100),anchor=CENTER,fill='gray60')
-            canvas.create_text(self.screen_width/2,self.screen_height/2+self.screen_height/7,text='press any key to start',font=('TkTextFont',50),anchor=CENTER,fill='gray25')
-            if len(self.keys) > 0:
-                self.started_game = True
+            if self.start_screen:
+                canvas.delete(ALL)
+                canvas.create_image(0,0, anchor=NW, image=self.bg)
+                canvas.create_text(self.screen_width/2,self.screen_height/2-self.screen_height/10,text='game',font=('TkTextFont',100),anchor=CENTER,fill='gray60')
+                canvas.create_text(self.screen_width/2,self.screen_height/2+self.screen_height/7,text='press any key to start',font=('TkTextFont',50),anchor=CENTER,fill='gray25')
+                if len(self.keys) > 0:
+                    self.start_screen = False
+                    self.keys = []
+            elif self.pause_screen:
+                canvas.delete(ALL)
+                canvas.create_image(0,0, anchor=NW, image=self.bg)
+                canvas.create_text(self.screen_width/2,self.screen_height/2-self.screen_height/10,text='paused',font=('TkTextFont',100),anchor=CENTER,fill='gray60')
+                canvas.create_text(self.screen_width/2,self.screen_height/2+self.screen_height/7,text='press any key to continue',font=('TkTextFont',50),anchor=CENTER,fill='gray25')
+                player.render()
+                for i in self.colliders:
+                    i.render()
+                for i in self.coins:
+                    i.render()
+                for i in self.geysers:
+                    i.render()
+                if len(self.keys) > 0:
+                    self.pause_screen = False
+                    self.keys = []
+
 
 
 
@@ -438,14 +330,14 @@ class Player:
         self.collider.start_y = self.y-24
         self.collider.end_x = self.x+24
         self.collider.end_y = self.y
-        self.vel_x -= self.vel_x/10.0
-        self.vel_y -= self.vel_y/10.0
+        self.vel_x -= self.vel_x/5.0
+        self.vel_y -= self.vel_y/5.0
         if abs(self.vel_x) < 0.1:
             self.vel_x = 0
         if abs(self.vel_y) < 0.1:
             self.vel_y = 0
     def render(self):
-        x = self.x
+        x = game.screen_width/2-12#self.x
         y = game.screen_height - self.y
         #pos = game.fit_to_screen(self.x,self.y)
         #x = pos[0]
@@ -462,11 +354,19 @@ class Player:
                 self.label = canvas.create_image(x,y, anchor=NW, image=self.skin_2_backwards)
 
 class Collider:
-    def __init__(self,start_x,start_y,end_x,end_y,image=None,mirror=False):
+    def __init__(self,start_x,start_y,end_x,end_y,image=None,mirror=False,moving=0,starting_pos=0):
         self.start_x = min([start_x,end_x])
         self.start_y = min([start_y,end_y])
         self.end_x = max([start_x,end_x])
         self.end_y = max([start_y,end_y])
+        self.mid_x = (self.end_x-self.start_x)/2+self.start_x
+
+        self.starting_x = self.mid_x
+        self.starting_pos = starting_pos
+        self.moving = moving
+        self.direction = 'up'
+        self.start_x += self.starting_pos
+        self.end_x += self.starting_pos
 
         self.mirror = mirror
 
@@ -524,33 +424,41 @@ class Collider:
                         has_collided = True
         return has_collided
     def render(self):
-        canvas.delete(self.skin)
-        if not self.mirror:
-            y1 = game.screen_height - self.start_y
-            y2 = game.screen_height - self.end_y
-            x1 = self.start_x
-            x2 = self.end_x
-            #pos = game.fit_to_screen(self.start_x,self.start_y)
-            #x1 = pos[0]
-            #y1 = pos[1]
-            if self.image and not self.image == 'color':
-                canvas.create_image(x1,y1, anchor=SW, image=self.image)
-            elif self.image == 'color':
-                canvas.create_rectangle(x1,y1,x2,y2,fill = 'gray',outline='gray')
-        else:
-            y1 = game.screen_height/2 - self.start_y
-            y2 = game.screen_height/2 - self.end_y
-            x1 = self.start_x
-            x2 = self.end_y
-            if self.image and not self.image == 'color':
-                canvas.create_image(x1,y1, anchor=SW, image=self.image)
-            elif self.image == 'color':
-                canvas.create_rectangle(x1,y1,x2,y2,fill = 'gray',outline='gray')
-        #else:
-        #    if not self.collided == False:
-        #        self.skin = canvas.create_rectangle(x1,y1,x2,y2,fill='green',outline='red')
-        #    else:
-        #        self.skin = canvas.create_rectangle(x1,y1,x2,y2,fill='red',outline='green')
+        if self.mid_x < self.starting_x+self.moving and self.direction == 'up':
+            self.start_x += 2
+            self.end_x += 2
+            self.mid_x += 2
+        elif self.direction == 'up':
+            self.direction = 'down'
+        if self.mid_x > self.starting_x and self.direction == 'down':
+            self.start_x -= 2
+            self.end_x -= 2
+            self.mid_x -= 2
+        elif self.direction == 'down':
+            self.direction = 'up'
+
+        if self.start_x < player.x + game.screen_width/2 and self.end_x > player.x - game.screen_width/2:
+            canvas.delete(self.skin)
+            if not self.mirror:
+                y = game.screen_height - self.start_y
+                x = game.screen_width/2 + (self.start_x-player.x)
+
+                #pos = game.fit_to_screen(self.start_x,self.start_y)
+                #x1 = pos[0]
+                #y1 = pos[1]
+                if self.image and not self.image == 'color':
+                    canvas.create_image(x,y, anchor=SW, image=self.image)
+                elif self.image == 'color':
+                    canvas.create_rectangle(x1,y1,x2,y2,fill = 'gray',outline='gray')
+            else:
+                y1 = game.screen_height/2 - self.start_y
+                y2 = game.screen_height/2 - self.end_y
+                x1 = self.start_x
+                x2 = self.end_y
+                if self.image and not self.image == 'color':
+                    canvas.create_image(x1,y1, anchor=SW, image=self.image)
+                elif self.image == 'color':
+                    canvas.create_rectangle(x1,y1,x2,y2,fill = 'gray',outline='gray')
 class Geyser:
     def __init__(self,x,time_between):
         self.x = x
