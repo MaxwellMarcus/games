@@ -36,7 +36,7 @@ class Game:
 
         self.loop = True
 
-        self.level = 1
+        self.level = 2
 
         self.keys = []
 
@@ -354,19 +354,26 @@ class Player:
                 self.label = canvas.create_image(x,y, anchor=NW, image=self.skin_2_backwards)
 
 class Collider:
-    def __init__(self,start_x,start_y,end_x,end_y,image=None,mirror=False,moving=0,starting_pos=0):
+    def __init__(self,start_x,start_y,end_x,end_y,image=None,mirror=False,moving=0,starting_pos=0,direction='x'):
         self.start_x = min([start_x,end_x])
         self.start_y = min([start_y,end_y])
         self.end_x = max([start_x,end_x])
         self.end_y = max([start_y,end_y])
         self.mid_x = (self.end_x-self.start_x)/2+self.start_x
+        self.mid_y = (self.end_y-self.start_y)/2+self.start_y
 
-        self.starting_x = self.mid_x
+        self.way = direction
         self.starting_pos = starting_pos
         self.moving = moving
         self.direction = 'up'
-        self.start_x += self.starting_pos
-        self.end_x += self.starting_pos
+        self.starting_x = self.mid_x
+        self.starting_y = self.mid_y
+        if self.direction == 'x':
+            self.start_x += self.starting_pos
+            self.end_x += self.starting_pos
+        else:
+            self.start_y += self.starting_pos
+            self.end_y += self.starting_pos
 
         self.mirror = mirror
 
@@ -424,18 +431,20 @@ class Collider:
                         has_collided = True
         return has_collided
     def render(self):
-        if self.mid_x < self.starting_x+self.moving and self.direction == 'up':
-            self.start_x += 2
-            self.end_x += 2
-            self.mid_x += 2
-        elif self.direction == 'up':
-            self.direction = 'down'
-        if self.mid_x > self.starting_x and self.direction == 'down':
-            self.start_x -= 2
-            self.end_x -= 2
-            self.mid_x -= 2
-        elif self.direction == 'down':
-            self.direction = 'up'
+        if self.way == 'x':
+            if self.mid_x < self.starting_x+self.moving and self.direction == 'up':
+                self.start_x += 2
+                self.end_x += 2
+                self.mid_x += 2
+            elif self.direction == 'up':
+                self.direction = 'down'
+            if self.mid_x > self.starting_x and self.direction == 'down':
+                self.start_x -= 2
+                self.end_x -= 2
+                self.mid_x -= 2
+            elif self.direction == 'down':
+                self.direction = 'up'
+        
 
         if self.start_x < player.x + game.screen_width/2 and self.end_x > player.x - game.screen_width/2:
             canvas.delete(self.skin)
