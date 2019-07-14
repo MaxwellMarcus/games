@@ -21,6 +21,8 @@ class Game:
 
         self.start_screen = True
         self.pause_screen = False
+        self.level_complete_screen = False
+        self.you_died_screen = False
 
         self.coin_img = PhotoImage(file='IMG_1073.gif')
         scale = int(1032/50)
@@ -33,6 +35,12 @@ class Game:
         scale_x = int(self.screen_width/40)
         scale_y = int(self.screen_height/25)
         self.bg = self.bg.zoom(scale_x,scale_y)
+        self.bg_x = 0
+        self.bg_2 = PhotoImage(file='bg_2.gif')
+        scale_x = int(self.screen_width/40)
+        scale_y = int(self.screen_height/25)
+        self.bg_2 = self.bg_2.zoom(scale_x,scale_y)
+        self.bg_2_x = self.screen_width
 
         self.loop = True
 
@@ -80,20 +88,30 @@ class Game:
                 self.coins.append(Collider(x,y,x+50,y+50,image=self.coin_img))
             for i in range(2):
                 x = i*300+6050
-                y = 800 - i*800
+                y = 900 - i*800
                 self.coins.append(Collider(x,y,x+50,y+50,image=self.coin_img))
         elif self.level == 2:
             self.coins.append(Collider(50,100,100,150,image=self.coin_img))
-            self.coins.append(Collider(400,100,450,150,image=self.coin_img,moving=300,starting_pos=random.randint(0,300)))
-            self.coins.append(Collider(700,100,750,150,image=self.coin_img,moving=300,starting_pos=random.randint(0,300)))
+            self.coins.append(Collider(400,100,450,150,image=self.coin_img,moving_x=300,starting_pos_x=0))
+            self.coins.append(Collider(1000,100,1050,150,image=self.coin_img,moving_x=300,starting_pos_x=300))
+            self.coins.append(Collider(1600,100,1650,150,image=self.coin_img,moving_y=300,starting_pos_y=0))
+            self.coins.append(Collider(2000,400,2050,450,image=self.coin_img,moving_y=300,starting_pos_y=300))
+            self.coins.append(Collider(2300,700,2350,750,image=self.coin_img,moving_y=300,starting_pos_y=0,moving_x=300,starting_pos_x=0))
+            self.coins.append(Collider(2700,1000,2750,1050,image=self.coin_img,moving_x=400,starting_pos_x=0))
+            self.coins.append(Collider(2700,100,2750,150,image=self.coin_img,moving_x=400,starting_pos_x=400))
+            for i in range(5):
+                x = i*300+3400
+                y = i*100+200
+                self.coins.append(Collider(x,y,x+50,y+50,image=self.coin_img))
+            self.coins.append(Collider(3400,100,34 50,150,image=self.coin_img,moving_y=700,starting_pos_y=0,moving_x=700,starting_pos_x=0))
     def set_platforms(self):
         self.colliders = [Collider(0,0,50000,15),Collider(0,0,15,self.screen_height),Collider(0,self.screen_height-15,self.screen_width,self.screen_height)]
         for i in self.coins:
-            x1 = i.start_x - 25
-            x2 = i.start_x + 75
-            y1 = i.end_y - 85
-            y2 = i.end_y - 60
-            self.colliders.append(Collider(x1,y1,x2,y2,image=self.platform_img,mirror=i.mirror,moving=i.moving))
+            x1 = i.starting_x - 50
+            x2 = i.starting_x + 50
+            y1 = i.starting_y - 60
+            y2 = i.starting_y - 35
+            self.colliders.append(Collider(x1,y1,x2,y2,image=self.platform_img,mirror=i.mirror,moving_x=i.moving_x,starting_pos_x=i.starting_pos_x,moving_y=i.moving_y,starting_pos_y=i.starting_pos_y))
         for i in self.blocks:
             self.colliders.append(i)
 
@@ -112,10 +130,19 @@ class Game:
                 self.keys.remove(key)
     def update(self):
         self.delta_time = time.time()-self.last_update
-        if not self.start_screen and not self.pause_screen:
+        if not self.start_screen and not self.pause_screen and not self.level_complete_screen and not self.you_died_screen:
             if self.delta_time > 0:
                 canvas.delete(ALL)
-                canvas.create_image(0,0, anchor=NW, image=self.bg)
+                if player.x > self.bg_x + self.screen_width*1.5:
+                    self.bg_x += self.screen_width*2
+                if player.x > self.bg_2_x + self.screen_width*1.5:
+                    self.bg_2_x += self.screen_width*2
+                while player.x < self.bg_x - self.screen_width*.5:
+                    self.bg_x -= self.screen_width*2
+                if player.x < self.bg_2_x - self.screen_width*.5:
+                    self.bg_2_x -= self.screen_width*2
+                canvas.create_image(game.screen_width/2-player.x+self.bg_x,player.y-game.screen_height/7, anchor=NW, image=self.bg)
+                canvas.create_image(game.screen_width/2-player.x+self.bg_2_x,player.y-game.screen_height/7, anchor=NW, image=self.bg_2)
                 if self.started:
                     if not self.time == None:
                         timer = int(self.time-self.timer)
@@ -130,15 +157,14 @@ class Game:
                         y = 100
                         word = 'Timer: '
                     canvas.create_text(x,y,text=word+str(timer),font=('TkTextFont',size))
-                if len(self.colliders) <= 4:
-                    self.set_platforms()
                 if len(self.coins) == 0:
                     self.set_coins()
+                    self.set_platforms()
                     self.set_geysers()
                 player.render()
                 forwards = False
                 backwards = False
-            #    player_speed = (self.delta_time)*500#100 p/s: dt/s*100
+                player_speed = (self.delta_time)*75#100 p/s: dt/s*100
                 if 'd' in self.keys:
                     forwards = True
                     player.accelerate(2,0)
@@ -219,6 +245,14 @@ class Game:
                                 if 'w' in self.keys:
                                     player.accelerate(0,40)
                                     self.key_release(None,'w')
+                                if i.moving_x > 0 and i.direction_x == 'up':
+                                    player.x += 2
+                                elif i.moving_x > 0 and i.direction_x == 'down':
+                                    player.x -= 2
+                                if i.moving_y > 0 and i.direction_y == 'up':
+                                    player.y += 2
+                                elif i.moving_y > 0 and i.direction_y == 'down':
+                                    player.y -= 2
                             else:
                                 player.y = i.start_y
                                 player.vel_y -= abs(player.vel_y)
@@ -226,6 +260,8 @@ class Game:
                             if self.colliders.index(i) == 0:
                                 self.set_coins()
                                 self.set_platforms()
+                                self.keys = []
+                                self.you_died_screen = True
                                 player.x = 51
                                 player.y = 400
                                 player.vel_y = -15
@@ -234,11 +270,22 @@ class Game:
 
                 for i in self.coins:
                     i.render()
+                    platform = self.colliders[self.coins.index(i)+3]
+                    x1 = i.start_x - 25
+                    x2 = i.start_x + 75
+                    y1 = i.end_y - 85
+                    y2 = i.end_y - 60
+                    #platform.start_x = x1
+                    #platform.end_x = x2
+                    #platform.start_y = y1
+                    #platform.end_y = y2
                     if i.has_collided(player.collider):
                         self.coins.remove(i)
                         canvas.delete(i.skin)
                         if len(self.coins) == 0:
                             self.level += 1
+                            self.level_complete_screen = True
+                            self.keys = []
                             player.x = 51
                             player.y = 400
                             player.vel_y = -15
@@ -251,12 +298,13 @@ class Game:
                     if i.collider.has_collided(player.collider):
                         self.set_coins()
                         self.set_platforms()
+                        self.keys = []
+                        self.you_died_screen = True
                         player.x = 51
                         player.y = 400
                         player.vel_y = -15
-                player.move()
+                player.move(player_speed)
                 root.update()
-    #            print('')
         else:
             if self.start_screen:
                 canvas.delete(ALL)
@@ -281,17 +329,27 @@ class Game:
                 if len(self.keys) > 0:
                     self.pause_screen = False
                     self.keys = []
-
+            elif self.level_complete_screen:
+                canvas.delete(ALL)
+                canvas.create_image(0,0, anchor=NW, image=self.bg)
+                canvas.create_text(self.screen_width/2,self.screen_height/2-self.screen_height/10,text='Level Complete!',font=('TkTextFont',100),anchor=CENTER,fill='gray60')
+                canvas.create_text(self.screen_width/2,self.screen_height/2+self.screen_height/7,text='press any key to continue',font=('TkTextFont',50),anchor=CENTER,fill='gray25')
+                if len(self.keys) > 0:
+                    self.level_complete_screen = False
+                    self.keys = []
+            elif self.you_died_screen:
+                canvas.delete(ALL)
+                canvas.create_image(0,0, anchor=NW, image=self.bg)
+                canvas.create_text(self.screen_width/2,self.screen_height/2-self.screen_height/10,text='You Died',font=('TkTextFont',100),anchor=CENTER,fill='gray60')
+                canvas.create_text(self.screen_width/2,self.screen_height/2+self.screen_height/7,text='press any key to restart',font=('TkTextFont',50),anchor=CENTER,fill='gray25')
+                if len(self.keys) > 0:
+                    self.you_died_screen = False
+                    self.keys = []
 
 
 
 
             root.update()
-    def fit_to_screen(self,x,y):
-        x *= self.screen_diff_x
-        y = 900-y
-        y *= self.screen_diff_y
-        return x,y
 
 class Player:
     def __init__(self):
@@ -323,8 +381,8 @@ class Player:
     def set_vel(self,x,y):
         self.vel_x = x
         self.vel_y = y
-    def move(self):
-        self.x += self.vel_x
+    def move(self,speed):
+        self.x += self.vel_x*speed
         self.y += self.vel_y
         self.collider.start_x = self.x
         self.collider.start_y = self.y-24
@@ -338,7 +396,7 @@ class Player:
             self.vel_y = 0
     def render(self):
         x = game.screen_width/2-12#self.x
-        y = game.screen_height - self.y
+        y = game.screen_height - game.screen_height/3#game.screen_height - self.y
         #pos = game.fit_to_screen(self.x,self.y)
         #x = pos[0]
         #y = pos[1]
@@ -354,7 +412,7 @@ class Player:
                 self.label = canvas.create_image(x,y, anchor=NW, image=self.skin_2_backwards)
 
 class Collider:
-    def __init__(self,start_x,start_y,end_x,end_y,image=None,mirror=False,moving=0,starting_pos=0,direction='x'):
+    def __init__(self,start_x,start_y,end_x,end_y,image=None,mirror=False,starting_pos_x=0,starting_pos_y=0,moving_x=0,moving_y=0):
         self.start_x = min([start_x,end_x])
         self.start_y = min([start_y,end_y])
         self.end_x = max([start_x,end_x])
@@ -362,18 +420,22 @@ class Collider:
         self.mid_x = (self.end_x-self.start_x)/2+self.start_x
         self.mid_y = (self.end_y-self.start_y)/2+self.start_y
 
-        self.way = direction
-        self.starting_pos = starting_pos
-        self.moving = moving
-        self.direction = 'up'
+        self.starting_pos_x = starting_pos_x
+        self.starting_pos_y = starting_pos_y
+        self.moving_x = moving_x
+        self.moving_y = moving_y
+        self.direction_x = 'up'
+        self.direction_y = 'up'
         self.starting_x = self.mid_x
         self.starting_y = self.mid_y
-        if self.direction == 'x':
-            self.start_x += self.starting_pos
-            self.end_x += self.starting_pos
-        else:
-            self.start_y += self.starting_pos
-            self.end_y += self.starting_pos
+        if not self.moving_x == 0:
+            self.start_x += self.starting_pos_x
+            self.end_x += self.starting_pos_x
+            self.mid_x += self.starting_pos_x
+        if not self.moving_y == 0:
+            self.start_y += self.starting_pos_y
+            self.end_y += self.starting_pos_y
+            self.mid_y += self.starting_pos_y
 
         self.mirror = mirror
 
@@ -431,25 +493,41 @@ class Collider:
                         has_collided = True
         return has_collided
     def render(self):
-        if self.way == 'x':
-            if self.mid_x < self.starting_x+self.moving and self.direction == 'up':
+        if self.moving_x:
+            if self.mid_x < self.starting_x+self.moving_x and self.direction_x == 'up':
                 self.start_x += 2
                 self.end_x += 2
                 self.mid_x += 2
-            elif self.direction == 'up':
-                self.direction = 'down'
-            if self.mid_x > self.starting_x and self.direction == 'down':
-                self.start_x -= 2
-                self.end_x -= 2
-                self.mid_x -= 2
-            elif self.direction == 'down':
-                self.direction = 'up'
-        
+            elif self.direction_x == 'up':
+                self.direction_x = 'down'
+            if self.mid_x > self.starting_x and self.direction_x == 'down':
+                if not self.moving_x < 0:
+                    self.start_x -= 2
+                    self.end_x -= 2
+                    self.mid_x -= 2
+            elif self.direction_x == 'down':
+                self.direction_x = 'up'
+
+        if self.moving_y:
+            if self.mid_y < self.starting_y+self.moving_y and self.direction_y == 'up':
+                if not self.moving_y < 0:
+                    self.start_y += 2
+                    self.end_y += 2
+                    self.mid_y += 2
+            elif self.direction_y == 'up':
+                self.direction_y = 'down'
+            if self.mid_y > self.starting_y and self.direction_y == 'down':
+                if not self.moving_y < 0:
+                    self.start_y -= 2
+                    self.end_y -= 2
+                    self.mid_y -= 2
+            elif self.direction_y == 'down':
+                self.direction_y = 'up'
 
         if self.start_x < player.x + game.screen_width/2 and self.end_x > player.x - game.screen_width/2:
             canvas.delete(self.skin)
             if not self.mirror:
-                y = game.screen_height - self.start_y
+                y = game.screen_height-(game.screen_height/3 + (self.start_y-player.y))
                 x = game.screen_width/2 + (self.start_x-player.x)
 
                 #pos = game.fit_to_screen(self.start_x,self.start_y)
