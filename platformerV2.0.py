@@ -103,7 +103,7 @@ class Game:
                 x = i*300+3400
                 y = i*100+200
                 self.coins.append(Collider(x,y,x+50,y+50,image=self.coin_img))
-            self.coins.append(Collider(3400,100,34 50,150,image=self.coin_img,moving_y=700,starting_pos_y=0,moving_x=700,starting_pos_x=0))
+            self.coins.append(Collider(3400,100,3450,150,image=self.coin_img,moving_y=700,starting_pos_y=0,moving_x=700,starting_pos_x=0))
     def set_platforms(self):
         self.colliders = [Collider(0,0,50000,15),Collider(0,0,15,self.screen_height),Collider(0,self.screen_height-15,self.screen_width,self.screen_height)]
         for i in self.coins:
@@ -262,12 +262,8 @@ class Game:
                                 self.set_platforms()
                                 self.keys = []
                                 self.you_died_screen = True
-                                player.x = 51
-                                player.y = 400
-                                player.vel_y = -15
                         except:
                             pass
-
                 for i in self.coins:
                     i.render()
                     platform = self.colliders[self.coins.index(i)+3]
@@ -300,9 +296,6 @@ class Game:
                         self.set_platforms()
                         self.keys = []
                         self.you_died_screen = True
-                        player.x = 51
-                        player.y = 400
-                        player.vel_y = -15
                 player.move(player_speed)
                 root.update()
         else:
@@ -320,12 +313,6 @@ class Game:
                 canvas.create_text(self.screen_width/2,self.screen_height/2-self.screen_height/10,text='paused',font=('TkTextFont',100),anchor=CENTER,fill='gray60')
                 canvas.create_text(self.screen_width/2,self.screen_height/2+self.screen_height/7,text='press any key to continue',font=('TkTextFont',50),anchor=CENTER,fill='gray25')
                 player.render()
-                for i in self.colliders:
-                    i.render()
-                for i in self.coins:
-                    i.render()
-                for i in self.geysers:
-                    i.render()
                 if len(self.keys) > 0:
                     self.pause_screen = False
                     self.keys = []
@@ -344,6 +331,9 @@ class Game:
                 canvas.create_text(self.screen_width/2,self.screen_height/2+self.screen_height/7,text='press any key to restart',font=('TkTextFont',50),anchor=CENTER,fill='gray25')
                 if len(self.keys) > 0:
                     self.you_died_screen = False
+                    player.x = 51
+                    player.y = 400
+                    player.move(1)
                     self.keys = []
 
 
@@ -383,7 +373,7 @@ class Player:
         self.vel_y = y
     def move(self,speed):
         self.x += self.vel_x*speed
-        self.y += self.vel_y
+        self.y += self.vel_y*speed
         self.collider.start_x = self.x
         self.collider.start_y = self.y-24
         self.collider.end_x = self.x+24
@@ -586,6 +576,28 @@ class Geyser:
         y1 = game.screen_height
         y2 = game.screen_height - self.y
         canvas.create_rectangle(self.x-25,y1,self.x+25,y2,fill='blue')
+
+class Grappler:
+    def __init__(self,x,y,vel_x,vel_y):
+        self.x = x
+        self.y = y
+        self.ox = x
+        self.oy = y
+        self.vel_x = x
+        self.vel_y = y
+
+        self.collider = Collider(self.x-5,self.y-5,self.x+5,self.y+5)
+    def update(self):
+        self.x += self.vel_x
+        self.y += self.vel_y
+
+        self.collider.start_x = self.x-5
+        self.collider.start_y = self.y-5
+        self.collider.end_x = self.x+5
+        self.collider.end_y = self.y+5
+    def render(self):
+        canvas.create_line(self.ox,self.oy,self.x,self.y,width=5)
+        canvas.create_rectangle(self.x-5,self.y-5,self.x+5,self.y+5,fill='black')
 
 
 
