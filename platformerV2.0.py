@@ -24,6 +24,8 @@ class Game:
         self.level_complete_screen = False
         self.you_died_screen = False
 
+        self.grappler = None
+
         self.coin_img = PhotoImage(file='IMG_1073.gif')
         scale = int(1032/50)
         self.coin_img = self.coin_img.subsample(scale,scale)
@@ -179,6 +181,8 @@ class Game:
                 if 'Escape' in self.keys:
                     self.pause_screen = True
                     self.keys = []
+                if 'p' in self.keys:
+                    self.grappler = Grappler(player.x,player.y,1,1)
                 if player.walks == 2:
                     player.walks = 0
                 if forwards == True:
@@ -296,6 +300,17 @@ class Game:
                         self.set_platforms()
                         self.keys = []
                         self.you_died_screen = True
+                if self.grappler:
+                    self.grappler.update()
+                    self.grappler.render()
+                    if self.grappler.collided:
+                        px = (self.grappler.x-self.grappler.ox)
+                        py = (self.grappler.y-self.grappler.oy)
+                        l = min([px,py])
+                        px /= l
+                        py /= l
+                        player.vel_x = px#self.grappler.vel_x
+                        player.vel_y = py#self.grappler.vel_y
                 player.move(player_speed)
                 root.update()
         else:
@@ -335,8 +350,6 @@ class Game:
                     player.y = 400
                     player.move(1)
                     self.keys = []
-
-
 
 
             root.update()
@@ -583,21 +596,31 @@ class Grappler:
         self.y = y
         self.ox = x
         self.oy = y
-        self.vel_x = x
-        self.vel_y = y
+        self.vel_x = vel_x
+        self.vel_y = vel_y
 
         self.collider = Collider(self.x-5,self.y-5,self.x+5,self.y+5)
+        self.collided = False
     def update(self):
-        self.x += self.vel_x
-        self.y += self.vel_y
+        if not self.collided:
+            self.x += self.vel_x*2
+            self.y += self.vel_y*2
 
-        self.collider.start_x = self.x-5
-        self.collider.start_y = self.y-5
-        self.collider.end_x = self.x+5
-        self.collider.end_y = self.y+5
+            self.collider.start_x = self.x-5
+            self.collider.start_y = self.y-5
+            self.collider.end_x = self.x+5
+            self.collider.end_y = self.y+5
+
+            for i in game.colliders:
+                if i.has_collided(self.collider):
+                    self.collided = True
     def render(self):
-        canvas.create_line(self.ox,self.oy,self.x,self.y,width=5)
-        canvas.create_rectangle(self.x-5,self.y-5,self.x+5,self.y+5,fill='black')
+        x = game.screen_width/2+12
+        y = game.screen_height - game.screen_height/3
+        y2 = game.screen_height-(game.screen_height/3 + (self.y-player.y))
+        x2 = game.screen_width/2 + (self.x-player.x)
+        canvas.create_line(x,y,x2,y2,width=5)
+        canvas.create_rectangle(x2-5,y2-5,x2+5,y2+5,fill='black')
 
 
 
