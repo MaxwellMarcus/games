@@ -46,7 +46,9 @@ class Game:
 
         self.loop = True
 
-        self.level = 2
+        self.grappler_equiped = False
+
+        self.level = 1
 
         self.keys = []
 
@@ -106,6 +108,10 @@ class Game:
                 y = i*100+200
                 self.coins.append(Collider(x,y,x+50,y+50,image=self.coin_img))
             self.coins.append(Collider(3400,100,3450,150,image=self.coin_img,moving_y=700,starting_pos_y=0,moving_x=700,starting_pos_x=0))
+        elif self.level == 3:
+            self.grappler_equiped = True
+            self.coins.append(Collider(50,100,100,150,image=self.coin_img))
+            self.coins.append(Collider(300,400,350,450,image=self.coin_img))
     def set_platforms(self):
         self.colliders = [Collider(0,0,50000,15),Collider(0,0,15,self.screen_height),Collider(0,self.screen_height-15,self.screen_width,self.screen_height)]
         for i in self.coins:
@@ -120,7 +126,14 @@ class Game:
 
     def set_geysers(self):
         self.geysers = []
-
+    def button_press(self,event):
+        if self.grappler_equiped:
+            px = (event.x-self.screen_width/2)
+            py = (self.screen_height/3*2-event.y)
+            l = max([abs(px),abs(py)])
+            px /= (l/2)
+            py /= (l/2)
+            self.grappler = Grappler(player.x,player.y,px,py)
     def key_press(self,event):
         self.keys.append(event.keysym)
     def key_release(self,event,key=None):
@@ -145,20 +158,7 @@ class Game:
                     self.bg_2_x -= self.screen_width*2
                 canvas.create_image(game.screen_width/2-player.x+self.bg_x,player.y-game.screen_height/7, anchor=NW, image=self.bg)
                 canvas.create_image(game.screen_width/2-player.x+self.bg_2_x,player.y-game.screen_height/7, anchor=NW, image=self.bg_2)
-                if self.started:
-                    if not self.time == None:
-                        timer = int(self.time-self.timer)
-                        size = 100
-                        x = self.screen_width/2
-                        y = self.screen_height/2
-                        word = 'Time: '
-                    else:
-                        timer = int(time.time()-self.timer)
-                        size = 25
-                        x = self.screen_width-100
-                        y = 100
-                        word = 'Timer: '
-                    canvas.create_text(x,y,text=word+str(timer),font=('TkTextFont',size))
+                canvas.create_text(game.screen_width-100,100,text=str(int(player.x))+','+str(int(player.y)),anchor=CENTER)
                 if len(self.coins) == 0:
                     self.set_coins()
                     self.set_platforms()
@@ -304,13 +304,28 @@ class Game:
                     self.grappler.update()
                     self.grappler.render()
                     if self.grappler.collided:
-                        px = (self.grappler.x-self.grappler.ox)
-                        py = (self.grappler.y-self.grappler.oy)
-                        l = min([px,py])
+                        px = (self.grappler.x-player.x)
+                        py = (self.grappler.y-player.y)
+                        l = min([abs(px),abs(py)])
                         px /= l
                         py /= l
-                        player.vel_x = px#self.grappler.vel_x
-                        player.vel_y = py#self.grappler.vel_y
+                        player.vel_x = px
+                        player.vel_y = py
+
+                        dist_x = (abs(self.grappler.x-player.x)+12)**2
+                        dist_y = (abs(self.grappler.y-player.y)+12)**2
+                        dist = math.sqrt(dist_x + dist_y)
+                        if dist < 50:
+                            self.grappler = False
+                            player.vel_x = 0
+                            player.vel_y = 0
+                            player.accelerate(0,40)
+                    else:
+                        dist_x = abs(self.grappler.x-self.grappler.ox)**2
+                        dist_y = abs(self.grappler.y-self.grappler.oy)**2
+                        dist = math.sqrt(dist_x+dist_y)
+                        if dist > 800:
+                            self.grappler = None
                 player.move(player_speed)
                 root.update()
         else:
@@ -348,7 +363,10 @@ class Game:
                     self.you_died_screen = False
                     player.x = 51
                     player.y = 400
+                    player.vel_x = 0
+                    player.vel_y = 0
                     player.move(1)
+                    self.grappler = None
                     self.keys = []
 
 
@@ -613,7 +631,17 @@ class Grappler:
 
             for i in game.colliders:
                 if i.has_collided(self.collider):
-                    self.collided = True
+                    self.collided = i
+                    self.distance_x = i.start_x - self.x
+                    self.distance_y = i.start_y - self.y
+        else:
+            self.x = self.collided.start_x - self.distance_x
+            self.y = self.collided.start_y - self.distance_y
+
+            self.collider.start_x = self.x-5
+            self.collider.start_y = self.y-5
+            self.collider.end_x = self.x+5
+            self.collider.end_y = self.y+5
     def render(self):
         x = game.screen_width/2+12
         y = game.screen_height - game.screen_height/3
@@ -629,6 +657,7 @@ player = Player()
 
 root.bind('<KeyPress>',game.key_press)
 root.bind('<KeyRelease>',game.key_release)
+root.bind('<Button-1>',game.button_press)
 
 while game.loop:
     game.update()

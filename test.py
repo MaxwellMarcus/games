@@ -1,16 +1,16 @@
-try:
-    from tkinter import *
-except:
-    from Tkinter import *
-import time
-import math
-root = Tk()
-bg = PhotoImage(file='bg_3.gif')
-canvas = Canvas(root,width=root.winfo_screenwidth(),height=root.winfo_screenheight(),bg=bg)
-canvas.pack(fill=BOTH,expand=YES)
-
-canvas.create_image(0,0,anchor=NW,image=bg)
-canvas.addtag_all('all')
-canvas.scale('all',0,0,10,10)
-while True:
-    root.update()
+n = input('Numerater: ')
+d = input('Denomenater: ')
+n = int(n)
+d = int(d)
+factors = []
+for i in range(n):
+    if n%(i+1) == 0:
+        factors.append(i+1)
+factors.reverse()
+for i in factors:
+    if d%i == 0:
+        n /= i
+        d /= i
+        break
+print(n)
+print(d)
